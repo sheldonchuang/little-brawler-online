@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>熱血格鬥連線 - Little Brawlers Online</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#181b36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Retro HUD -->
+  <header id="game-hud">
+    <div class="hud-left">
+      <div class="hud-portrait">🥊</div>
+      <div class="hud-bars">
+        <div class="hud-name-row">
+          <span id="hud-player-name">熱血少年</span>
+          <span id="hud-kills">擊倒: 0</span>
+        </div>
+        <div class="bar-container hp-container">
+          <div id="hud-hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div>
+          <span id="hud-hp-text" class="bar-label">100 / 100</span>
+        </div>
+        <div class="bar-container mp-container">
+          <div id="hud-mp-bar" class="bar-fill mp-fill" style="width: 100%;"></div>
+          <span id="hud-mp-text" class="bar-label">100 / 100</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-center">
+      <div class="room-badge">
+        <span class="room-label">房間:</span>
+        <span id="hud-room-name">ARENA-1</span>
+      </div>
+      <div id="connection-status" class="status-connected">🟢 已連線</div>
+    </div>
+
+    <div class="hud-right">
+      <span id="hud-online-count">在線: 1</span>
+      <button id="btn-spawn-bot" class="hud-btn" title="召喚小兵假人練習">🤖 召喚對手</button>
+      <button id="btn-toggle-bgm" class="hud-btn">🎵 音樂: 關</button>
+      <button id="btn-toggle-touch" class="hud-btn">📱 虛擬搖桿</button>
+    </div>
+  </header>
+
+  <!-- Main Game Canvas Area -->
+  <main id="canvas-container">
+    <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+    <!-- Respawn Overlay -->
+    <div id="respawn-overlay" style="display: none;">
+      <div class="respawn-box">
+        <h2>💀 被擊倒 (K.O.)</h2>
+        <p>正在重整態勢...</p>
+        <div class="countdown-circle">
+          <span id="respawn-time">3</span>
+        </div>
+        <p class="respawn-tip">提示：倒地起身時有 1 秒無敵保護！善用防禦 (U / 防) 減免 80% 傷害！</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mobile Touch Controls -->
+  <div id="mobile-controls" style="display: none;">
+    <!-- Left Virtual Joystick -->
+    <div id="touch-dpad">
+      <div id="touch-stick"></div>
+    </div>
+
+    <!-- Right Action Buttons -->
+    <div id="touch-action-buttons">
+      <div class="touch-row">
+        <button id="btn-guard" class="action-btn btn-guard">🛡️<br><span>防</span></button>
+        <button id="btn-skill" class="action-btn btn-skill">⚡<br><span>技</span></button>
+      </div>
+      <div class="touch-row">
+        <button id="btn-jump" class="action-btn btn-jump">🦘<br><span>跳</span></button>
+        <button id="btn-attack" class="action-btn btn-attack">👊<br><span>攻</span></button>
+      </div>
+      <button id="btn-dash" class="action-btn btn-dash">💨 衝刺</button>
+    </div>
+  </div>
+
+  <!-- Bottom Chat & Taunts Bar -->
+  <aside id="chat-panel">
+    <div id="chat-messages"></div>
+    <div class="chat-quick-emojis">
+      <button class="emoji-btn">👊</button>
+      <button class="emoji-btn">🔥</button>
+      <button class="emoji-btn">⚡</button>
+      <button class="emoji-btn">💨</button>
+      <button class="emoji-btn">💀</button>
+      <button class="emoji-btn">KO!</button>
+      <button class="emoji-btn">來PK!</button>
+    </div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="按 Enter 或點此輸入發話..." maxlength="40" autocomplete="off">
+      <button type="submit" id="btn-send-chat">送出</button>
+    </form>
+  </aside>
+
+  <!-- Join Game & Character Select Modal -->
+  <div id="lobby-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h1>🥊 熱血格鬥連線</h1>
+        <p class="subtitle">Little Brawlers Online — 致敬《熱血物語》與《小朋友齊打交 LF2》</p>
+      </div>
+
+      <div class="form-section">
+        <div class="input-group">
+          <label for="input-name">格鬥家暱稱</label>
+          <input type="text" id="input-name" value="熱血格鬥家" maxlength="10">
+        </div>
+        <div class="input-group">
+          <label for="input-room">房間代號 (輸入相同代號即可連線)</label>
+          <input type="text" id="input-room" value="ARENA-1" maxlength="12">
+        </div>
+      </div>
+
+      <h3>選擇你的格鬥角色</h3>
+      <div class="hero-selection">
+        <!-- Fire Hero -->
+        <div class="hero-card selected" data-hero="fire">
+          <div class="hero-avatar fire-avatar">🔥</div>
+          <div class="hero-info">
+            <h4>赤焰 (Davis / 國夫)</h4>
+            <div class="hero-tag">全能拳術型</div>
+            <p>絕招：<strong>波動氣功拳</strong></p>
+            <span class="hero-desc">昇龍三連拳、高速氣功彈，攻守兼備。</span>
+          </div>
+        </div>
+
+        <!-- Ice Hero -->
+        <div class="hero-card" data-hero="ice">
+          <div class="hero-avatar ice-avatar">❄️</div>
+          <div class="hero-info">
+            <h4>疾風 (Dennis / 冰人)</h4>
+            <div class="hero-tag">敏捷腿法型</div>
+            <p>絕招：<strong>追蹤冰晶彈</strong></p>
+            <span class="hero-desc">超快移動步法、連環踢擊、雙發冰魄彈。</span>
+          </div>
+        </div>
+
+        <!-- Titan Hero -->
+        <div class="hero-card" data-hero="titan">
+          <div class="hero-avatar titan-avatar">🪨</div>
+          <div class="hero-info">
+            <h4>阿豪 (Titan / 豪鬼)</h4>
+            <div class="hero-tag">霸體重裝型</div>
+            <p>絕招：<strong>巨岩裂地衝</strong></p>
+            <span class="hero-desc">高達 150 超高體力、重砲鐵拳、地面震波擊。</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Guide -->
+      <div class="controls-guide">
+        <div class="guide-col">
+          <strong>💻 電腦操作：</strong>
+          <ul>
+            <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 方向鍵：八向走位</li>
+            <li>雙擊 <kbd>A</kbd> / <kbd>D</kbd> 或 <kbd>Shift</kbd>：疾走衝刺</li>
+            <li><kbd>J</kbd>：三段連續拳腳攻擊 (空中按為飛踢)</li>
+            <li><kbd>K</kbd> / <kbd>Space</kbd>：跳躍</li>
+            <li><kbd>L</kbd>：施展必殺氣功絕招 (消耗 MP)</li>
+            <li><kbd>U</kbd>：格擋防禦 (減少 80% 傷害)</li>
+          </ul>
+        </div>
+        <div class="guide-col">
+          <strong>📱 手機操作：</strong>
+          <ul>
+            <li>左側：虛擬類比搖桿 (推到底自動疾走)</li>
+            <li>右側按鈕：【攻】打擊、【跳】跳躍、【技】絕招、【防】防禦、【閃】衝刺</li>
+            <li>支援多點觸控，跳躍中可按攻擊發動飛踢！</li>
+          </ul>
+        </div>
+      </div>
+
+      <button id="btn-join" class="btn-primary">進入格鬥場 (START FIGHT!)</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="renderer.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

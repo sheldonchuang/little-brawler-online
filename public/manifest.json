@@ -1,0 +1,18 @@
+{
+  "name": "熱血格鬥連線",
+  "short_name": "熱血格鬥",
+  "description": "致敬《熱血物語》與《小朋友齊打交 LF2》的 2.5D 連線動作格鬥遊戲",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b0c14",
+  "theme_color": "#181b36",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

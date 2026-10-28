@@ -1,0 +1,18 @@
+{
+  "name": "little-brawler-online",
+  "version": "1.0.0",
+  "description": "Retro 2.5D Belt-Scroller Online Multiplayer Game (River City Ransom & Little Fighter 2 tribute)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "game",
+    "multiplayer",
+    "beat-em-up",
+    "little-fighter",
+    "websocket"
+  ],
+  "author": "",
+  "license": "MIT"
+}
